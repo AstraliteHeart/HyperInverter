@@ -17,4 +17,11 @@ DATASETS = {
         "test_source_root": dataset_paths["church_test"],
         "test_target_root": dataset_paths["church_test"],
     },
+    'pony_encode': {
+		'transforms': transforms_config.EncodeTransforms,
+		'train_source_root': dataset_paths['pony_train'],
+		'train_target_root': dataset_paths['pony_train'],
+		'test_source_root': dataset_paths['pony_test'],
+		'test_target_root': dataset_paths['pony_test'],
+	}
 }

@@ -5,6 +5,9 @@ dataset_paths = {
     # Churches (LSUN Churches)
     "church_train": "",
     "church_test": "",
+    # Pony
+	'pony_train': '/root/pony/train/',
+	'pony_test': '/root/pony/test/'	
 }
 
 model_paths = {

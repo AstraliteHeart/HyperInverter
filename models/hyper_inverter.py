@@ -63,11 +63,7 @@ class HyperInverter(nn.Module):
     def load_weights(self):
         # Load W-Encoder (E1 Encoder in Paper)
         if self.opts.w_encoder_path is not None:
-            w_encoder_path = self.opts.w_encoder_path
-        elif self.opts.dataset_type == "ffhq_encode" and model_paths["w_encoder_ffhq"] is not None:
-            w_encoder_path = model_paths["w_encoder_ffhq"]
-        elif self.opts.dataset_type == "church_encode" and model_paths["w_encoder_church"] is not None:
-            w_encoder_path = model_paths["w_encoder_church"]
+            w_encoder_path = self.opts.w_encoder_path        
         else:
             raise Exception("Please specify the path to the pretrained W encoder.")
 
@@ -77,23 +73,12 @@ class HyperInverter(nn.Module):
 
         opts = ckpt["opts"]
         opts = argparse.Namespace(**opts)
-
-        if "ffhq" in self.opts.dataset_type or "celeb" in self.opts.dataset_type:
-            # Using ResNet-IRSE50 for facial domain
-            self.w_encoder = fpn_encoders.BackboneEncoderUsingLastLayerIntoW(50, "ir_se", opts)
-        else:
-            # Using ResNet34 pre-trained on ImageNet for other domains
-            self.w_encoder = fpn_encoders.ResNetEncoderUsingLastLayerIntoW()
+        
+        self.w_encoder = fpn_encoders.Encoder4Editing(50, 'ir_se', self.opts)
 
         self.w_encoder.load_state_dict(common.get_keys(ckpt, "encoder"), strict=True)
         self.w_encoder.to(self.opts.device).eval()
         common.toogle_grad(self.w_encoder, False)
-
-        # Load pretrained StyleGAN2-ADA models
-        if self.opts.dataset_type == "ffhq_encode":
-            stylegan_ckpt_path = model_paths["stylegan2_ada_ffhq"]
-        elif self.opts.dataset_type == "church_encode":
-            stylegan_ckpt_path = model_paths["stylegan2_ada_church"]
 
         with open(stylegan_ckpt_path, "rb") as f:
             ckpt = pickle.load(f)
